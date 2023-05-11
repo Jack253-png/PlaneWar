@@ -5,6 +5,7 @@
 #include <QTimer>
 #include <QGraphicsPixmapItem>
 #include "blurableobject.h"
+#include "gameplanewarselfplane.h"
 
 class GamePlaneWarBullet : public BlurableObject
 {
@@ -15,11 +16,12 @@ public:
     void stopTimer();
     void resumeTimer();
     void removeThis();
+    GamePlaneWarSelfPlane *selfPlane;
 private:
     QTimer *eventTimer;
     bool isEnemyBullet = false;
+    QObject *game;
 signals:
-    void onDelete(GamePlaneWarBullet *bullet);
 public slots:
     void onEventTimerTimeout();
 };

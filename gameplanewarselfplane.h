@@ -14,6 +14,9 @@ class GamePlaneWarSelfPlane : public BlurableObject
 public:
     explicit GamePlaneWarSelfPlane(QObject *parent = nullptr);
     QTimer *eventTimer;
+    int score = 0;
+
+    void updateScore();
 private:
     bool up = false;
     bool down = false;

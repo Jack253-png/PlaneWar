@@ -5,5 +5,8 @@
         <file>myplane2.png</file>
         <file>bullet1.png</file>
         <file>bullet2.png</file>
+        <file>big_enemy.png</file>
+        <file>mid_enemy.png</file>
+        <file>small_enemy.png</file>
     </qresource>
 </RCC>

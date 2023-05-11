@@ -22,6 +22,10 @@ GamePlaneWarSelfPlane::GamePlaneWarSelfPlane(QObject *parent) {
     this->eventTimer->start();
 }
 
+void GamePlaneWarSelfPlane::updateScore() {
+    qDebug() << score;
+}
+
 void GamePlaneWarSelfPlane::onKeyPressed(QKeyEvent *event) {
     this->setFocus();
     int k = event->key();

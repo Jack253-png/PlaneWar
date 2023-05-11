@@ -5,9 +5,11 @@
 #include <QApplication>
 #include <QGraphicsScene>
 #include <QGraphicsPixmapItem>
+#include <QDebug>
 
 GameBaseWindow::GameBaseWindow(QObject *parent) {
     QApplication *app = (QApplication*) parent;
+    this->app = app;
 
     this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -18,6 +20,15 @@ GameBaseWindow::GameBaseWindow(QObject *parent) {
     this->setWindowTitle("飞机大战 Cpp Demo");
 
     this->planeWar = new GamePlaneWar(this);
+
+    this->baseTimer = new QTimer();
+    this->baseTimer->setInterval(100);
+    connect(this->baseTimer, SIGNAL(timeout()), this, SLOT(onBaseTimerTimeout()));
+    this->baseTimer->start();
+}
+
+void GameBaseWindow::onBaseTimerTimeout() {
+    app->processEvents();
 }
 
 void GameBaseWindow::initComponments() {
@@ -125,6 +136,7 @@ void GameBaseWindow::onGamePreStart() {
     hideGameMenu(true);
     this->backgroundItem->exceptedBlurRadius = 0;
     emit onGamePreStartComplete();
+    this->scene->setFocus();
 }
 
 void GameBaseWindow::onGamePreContinue() {

@@ -2,6 +2,7 @@
 #define GAMEPLANEWAR_H
 
 #include "gameplanewarselfplane.h"
+#include "gameplanewarenemyplane.h"
 #include "gameplanewarbullet.h"
 #include <QList>
 #include <QObject>
@@ -14,13 +15,17 @@ class GamePlaneWar : public QObject
     Q_OBJECT
 public:
     explicit GamePlaneWar(QObject *parent = nullptr);
+    QList<GamePlaneWarBullet*> *bullets;
+    QList<GamePlaneWarEnemyPlane*> *enemyPlanes;
+    GamePlaneWarSelfPlane *selfPlane;
 private:
     QGraphicsScene *scene;
-    GamePlaneWarSelfPlane *selfPlane;
-    QList<GamePlaneWarBullet*> *bullets;
+    QTimer *eventTimer;
 
     void showBullets(bool isBlur);
     void cleanBullets();
+    void showEnemys(bool isBlur);
+    void cleanEnemys();
     bool isPausing = false;
 signals:
     void onGamePause();
@@ -36,6 +41,8 @@ public slots:
     void onKeyReleased(QKeyEvent *event);
     void onSelfPlaneBulleting();
     void onBulletDelete(GamePlaneWarBullet *bullet);
+    void onEventTimerTimeout();
+    void onEnemyDelete(GamePlaneWarEnemyPlane *enemy);
 };
 
 #endif // GAMEPLANEWAR_H

@@ -30,7 +30,8 @@ SOURCES += \
     gameplanewarselfplane.cpp \
     gameplanewarbullet.cpp \
     blurableobject.cpp \
-    gamebasewindow.cpp
+    gamebasewindow.cpp \
+    gameplanewarenemyplane.cpp
 
 HEADERS += \
     graphicsbutton.h \
@@ -39,7 +40,8 @@ HEADERS += \
     gameplanewarselfplane.h \
     vars.h \
     gameplanewarbullet.h \
-    blurableobject.h
+    blurableobject.h \
+    gameplanewarenemyplane.h
 
 FORMS +=
 

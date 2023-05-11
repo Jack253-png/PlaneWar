@@ -12,6 +12,7 @@
 #include <QGraphicsRectItem>
 #include <QGraphicsBlurEffect>
 #include <blurableobject.h>
+#include <QApplication>
 
 class GameBaseWindow : public QGraphicsView {
     Q_OBJECT
@@ -29,6 +30,8 @@ protected:
 private:
     QGraphicsScene *scene;
     QGraphicsPixmapItem* createBg();
+    QTimer *baseTimer;
+    QApplication *app;
     void hideGameMenu(bool isHide);
     void hidePauseMenu(bool isHide);
 
@@ -53,6 +56,7 @@ public slots:
     void onGamePause();
     void onGamePreStart();
     void onGamePreContinue();
+    void onBaseTimerTimeout();
 };
 
 #endif // GAMEBASEWINDOW_H
