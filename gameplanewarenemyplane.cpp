@@ -19,36 +19,6 @@ GamePlaneWarEnemyPlane::GamePlaneWarEnemyPlane(QObject *parent) {
 
 void GamePlaneWarEnemyPlane::onEventTimerTimeout() {
     this->moveBy(0, 5);
-    QList<QGraphicsItem *> coll = collidingItems();
-    if (coll.size() > 1) {
-        for (int index = 1; index < coll.size(); index++) {
-            if (typeid(*coll[index]) == typeid(GamePlaneWarSelfPlane)) {
-                int score = 0;
-                switch (this->state) {
-                case BIG_PLANE:
-                    score = 10;
-                    break;
-                case MID_PLANE:
-                    score = 3;
-                    break;
-                case SMALL_PLANE:
-                    score = 1;
-                    break;
-                default:
-                    break;
-                }
-                if (((GamePlaneWar*) this->game)->selfPlane->score >= score * 2) {
-                    ((GamePlaneWar*) this->game)->selfPlane->score -= score * 2;
-                }
-                else {
-                    ((GamePlaneWar*) this->game)->selfPlane->score = 0;
-                }
-                ((GamePlaneWar*) this->game)->selfPlane->updateScore();
-                ((GamePlaneWar*) this->game)->enemyPlanes->removeAll(this);
-                delete this;
-            }
-        }
-    }
     if (this->y() > WINDOW_SIZE_HEIGHT) {
         ((GamePlaneWar*) this->game)->enemyPlanes->removeAll(this);
         delete this;
@@ -81,6 +51,6 @@ void GamePlaneWarEnemyPlane::resumeTimer() {
 }
 
 void GamePlaneWarEnemyPlane::removeThis() {
-    this->scene()->removeItem(this);
+//    this->scene()->removeItem(this);
     delete this;
 }

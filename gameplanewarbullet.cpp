@@ -72,6 +72,6 @@ void GamePlaneWarBullet::resumeTimer() {
 }
 
 void GamePlaneWarBullet::removeThis() {
-    this->scene()->removeItem(this);
+//    this->scene()->removeItem(this);
     delete this;
 }

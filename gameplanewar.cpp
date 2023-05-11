@@ -86,10 +86,10 @@ void GamePlaneWar::showBullets(bool isBlur) {
 void GamePlaneWar::cleanBullets() {
     for (int index = 0; index < this->bullets->size(); index++) {
         GamePlaneWarBullet *bullet = this->bullets->at(index);
-//        this->scene->removeItem(bullet);
+        bullet->show = false;
+        bullet->stopTimer();
         this->bullets->removeAll(bullet);
-        bullet->removeThis();
-//        delete bullet;
+        delete bullet;
     }
 }
 
@@ -106,10 +106,10 @@ void GamePlaneWar::showEnemys(bool isBlur) {
 void GamePlaneWar::cleanEnemys() {
     for (int index = 0; index < this->enemyPlanes->size(); index++) {
         GamePlaneWarEnemyPlane *plane = this->enemyPlanes->at(index);
-//        this->scene->removeItem(bullet);
+        plane->show = false;
+        plane->stopTimer();
         this->enemyPlanes->removeAll(plane);
-        plane->removeThis();
-//        delete bullet;
+        delete plane;
     }
 }
 
@@ -128,6 +128,8 @@ void GamePlaneWar::onGameEndCallback() {
     this->selfPlane->show = false;
     this->selfPlane->exceptedBlurRadius = 20;
     this->selfPlane->eventTimer->stop();
+    this->cleanBullets();
+    this->cleanEnemys();
     this->cleanBullets();
     this->cleanEnemys();
     this->selfPlane->score = 0;

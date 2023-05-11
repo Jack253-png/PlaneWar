@@ -1,4 +1,5 @@
 #include "gameplanewarselfplane.h"
+#include "gameplanewarenemyplane.h"
 #include "gameplanewarbullet.h"
 #include "gameplanewar.h"
 #include <QPixmap>
@@ -10,6 +11,7 @@
 
 GamePlaneWarSelfPlane::GamePlaneWarSelfPlane(QObject *parent) {
     GamePlaneWar *planeWarGame = (GamePlaneWar*) parent;
+    this->game = planeWarGame;
 
     this->setZValue(2);
 
@@ -54,4 +56,37 @@ void GamePlaneWarSelfPlane::onEventTimerTimeout() {
     image = !image;
 
     this->setPixmap(image ? IMG_MYPLANE_1 : IMG_MYPLANE_2);
+
+
+    QList<QGraphicsItem *> coll = collidingItems();
+    if (coll.size() > 1) {
+        for (int index = 1; index < coll.size(); index++) {
+            if (typeid(*coll[index]) == typeid(GamePlaneWarEnemyPlane)) {
+                GamePlaneWarEnemyPlane *ene = (GamePlaneWarEnemyPlane*) coll[index];
+                int score = 0;
+                switch (ene->state) {
+                case BIG_PLANE:
+                    score = 10;
+                    break;
+                case MID_PLANE:
+                    score = 3;
+                    break;
+                case SMALL_PLANE:
+                    score = 1;
+                    break;
+                default:
+                    break;
+                }
+                if (this->score >= score * 2) {
+                    this->score -= score * 2;
+                }
+                else {
+                    this->score = 0;
+                }
+                this->updateScore();
+                ((GamePlaneWar*) this->game)->enemyPlanes->removeAll(ene);
+                delete ene;
+            }
+        }
+    }
 }

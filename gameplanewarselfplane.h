@@ -24,6 +24,7 @@ private:
     bool right = false;
 
     bool image = false;
+    QObject *game;
 signals:
     void onBulleting();
 public slots:
