@@ -27,10 +27,12 @@ private:
     QObject *game;
 signals:
     void onBulleting();
+    void onScoreTo0();
 public slots:
     void onKeyPressed(QKeyEvent *event);
     void onKeyReleased(QKeyEvent *event);
     void onEventTimerTimeout();
+    void onGameEndCallback();
 };
 
 #endif // GAMEPLANEWARSELFPLANE_H

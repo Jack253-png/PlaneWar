@@ -6,10 +6,13 @@
 #include <QDebug>
 #include <QList>
 #include <cstdlib>
+#include <iostream>
+#include "windows.h"
 
 GamePlaneWar::GamePlaneWar(QObject *parent) {
     srand(rand());
     GameBaseWindow *base = (GameBaseWindow*) parent;
+    this->window = base;
 
     this->scene = base->getScene();
     this->bullets = new QList<GamePlaneWarBullet*>();
@@ -37,10 +40,30 @@ GamePlaneWar::GamePlaneWar(QObject *parent) {
     connect(this, SIGNAL(onOperationKeyPressed(QKeyEvent*)), this->selfPlane, SLOT(onKeyPressed(QKeyEvent*)));
     connect(this, SIGNAL(onOperationKeyReleased(QKeyEvent*)), this->selfPlane, SLOT(onKeyReleased(QKeyEvent*)));
     connect(this->selfPlane, SIGNAL(onBulleting()), this, SLOT(onSelfPlaneBulleting()));
+    connect(this->selfPlane, SIGNAL(onScoreTo0()), this, SLOT(onGameEndedScoreTo0()));
+    connect(base, SIGNAL(onGamePreEnd()), this->selfPlane, SLOT(onGameEndCallback()));
 
     this->eventTimer = new QTimer();
     this->eventTimer->setInterval(1000);
     connect(this->eventTimer, SIGNAL(timeout()), this, SLOT(onEventTimerTimeout()));
+
+    this->timeDelTimer = new QTimer();
+    this->timeDelTimer->setInterval(1000);
+    connect(this->timeDelTimer, SIGNAL(timeout()), this, SLOT(onTimeDelTimerTimeout()));
+}
+
+void GamePlaneWar::onTimeDelTimerTimeout() {
+    this->time_eplased += 1;
+    qDebug() << this->time_eplased;
+    if (this->time_eplased > 30) {
+        ((GameBaseWindow*) this->window)->setCustomMessage("时间到, 您得了 " + QString::number(this->selfPlane->score) + " 分");
+        emit onGameTimeoutExit();
+    }
+}
+
+void GamePlaneWar::onGameEndedScoreTo0() {
+    ((GameBaseWindow*) this->window)->setCustomMessage("分数归零, 游戏结束");
+    emit onGameFailedExit();
 }
 
 void GamePlaneWar::onEventTimerTimeout() {
@@ -121,6 +144,13 @@ void GamePlaneWar::onGameStart() {
     this->cleanBullets();
     this->cleanEnemys();
     this->selfPlane->score = 0;
+    this->selfPlane->updateScore();
+    this->time_eplased = 0;
+    this->timeDelTimer->start();
+    this->selfPlane->setPos(
+                WINDOW_SIZE_WIDTH / 2 - this->selfPlane->pixmap().width() / 2,
+                WINDOW_SIZE_HEIGHT - this->selfPlane->pixmap().height()
+    );
 }
 
 void GamePlaneWar::onGameEndCallback() {
@@ -133,6 +163,8 @@ void GamePlaneWar::onGameEndCallback() {
     this->cleanBullets();
     this->cleanEnemys();
     this->selfPlane->score = 0;
+    this->time_eplased = 0;
+    this->timeDelTimer->stop();
 }
 
 void GamePlaneWar::onGamePauseCallback() {
@@ -142,6 +174,7 @@ void GamePlaneWar::onGamePauseCallback() {
     this->showBullets(true);
     this->showEnemys(true);
     isPausing = true;
+    this->timeDelTimer->stop();
 }
 
 void GamePlaneWar::onGameContinue() {
@@ -151,6 +184,7 @@ void GamePlaneWar::onGameContinue() {
     this->showBullets(false);
     this->showEnemys(false);
     isPausing = false;
+    this->timeDelTimer->start();
 }
 
 void GamePlaneWar::onKeyPressed(QKeyEvent *event) {
@@ -193,7 +227,6 @@ void GamePlaneWar::onSelfPlaneBulleting() {
 void GamePlaneWar::onBulletDelete(GamePlaneWarBullet *bullet) {
     while (isPausing) {}
     bullet->stopTimer();
-//    this->scene->removeItem(bullet);
     this->bullets->removeAll(bullet);
     bullet->removeThis();
 }

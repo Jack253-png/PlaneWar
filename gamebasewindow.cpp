@@ -6,6 +6,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsPixmapItem>
 #include <QDebug>
+#include "windows.h"
 
 GameBaseWindow::GameBaseWindow(QObject *parent) {
     QApplication *app = (QApplication*) parent;
@@ -25,6 +26,9 @@ GameBaseWindow::GameBaseWindow(QObject *parent) {
     this->baseTimer->setInterval(100);
     connect(this->baseTimer, SIGNAL(timeout()), this, SLOT(onBaseTimerTimeout()));
     this->baseTimer->start();
+
+    this->scene->setFocus();
+    this->setFocus();
 }
 
 void GameBaseWindow::onBaseTimerTimeout() {
@@ -65,9 +69,17 @@ void GameBaseWindow::initComponments() {
     this->pauseExit->setPos(WINDOW_SIZE_WIDTH / 2 - 100, 250, 200, 60);
     this->pauseExit->setVisible(false);
 
+    this->scoreLabel = new GraphicsButton(this->scene);
+    this->scoreLabel->setPos(0, 0, WINDOW_SIZE_WIDTH, 60);
+    this->scoreLabel->setText("");
+    this->scoreLabel->showBg = false;
+
     connect(this->gameStartButton, SIGNAL(onClicked()), this, SLOT(onGamePreStart()));
     connect(this->pauseContinue, SIGNAL(onClicked()), this, SLOT(onGamePreContinue()));
     connect(this->pauseExit, SIGNAL(onClicked()), this, SLOT(onGameEnd()));
+
+    connect(this->planeWar, SIGNAL(onGameFailedExit()), this, SLOT(onGameEnd()));
+    connect(this->planeWar, SIGNAL(onGameTimeoutExit()), this, SLOT(onGameEnd()));
 
     this->scene->addItem(this->backgroundItem);
     this->scene->addItem(this->gameTitle);
@@ -75,10 +87,27 @@ void GameBaseWindow::initComponments() {
     this->scene->addItem(this->pauseTitle);
     this->scene->addItem(this->pauseContinue);
     this->scene->addItem(this->pauseExit);
+    this->scene->addItem(this->scoreLabel);
+}
+
+void GameBaseWindow::setScore(int i) {
+    this->scoreLabel->setText("分数: " + QString::number(i) + " 分");
+    this->score = i;
+}
+
+void GameBaseWindow::setCustomMessage(QString string) {
+    this->customMessage = string;
 }
 
 void GameBaseWindow::run() {
     this->show();
+
+    // solve problem of key event failed (?
+    emit this->gameStartButton->onClicked();
+    this->gamePausing = true;
+    this->hidePauseMenu(false);
+    emit this->pauseExit->onClicked();
+    this->scoreLabel->setText("");
 }
 
 QGraphicsScene* GameBaseWindow::getScene() {
@@ -123,12 +152,22 @@ void GameBaseWindow::onGameEnd() {
     hidePauseMenu(true);
     hideGameMenu(false);
     this->backgroundItem->exceptedBlurRadius = 20;
+    if (this->customMessage != NULL) {
+        this->scoreLabel->setText(this->customMessage);
+    }
+    else {
+        this->scoreLabel->setText("您已退出游戏，得分为 " + QString::number(this->score) + " 分");
+    }
+    this->scene->setFocus();
+    this->setFocus();
 }
 
 void GameBaseWindow::onGamePause() {
     this->gamePausing = true;
     this->backgroundItem->exceptedBlurRadius = 20;
     hidePauseMenu(false);
+    this->scene->setFocus();
+    this->setFocus();
 }
 
 void GameBaseWindow::onGamePreStart() {
@@ -137,6 +176,11 @@ void GameBaseWindow::onGamePreStart() {
     this->backgroundItem->exceptedBlurRadius = 0;
     emit onGamePreStartComplete();
     this->scene->setFocus();
+    this->setFocus();
+
+    QGraphicsRectItem *item = new QGraphicsRectItem();
+    this->scene->addItem(item);
+    delete item;
 }
 
 void GameBaseWindow::onGamePreContinue() {
@@ -144,4 +188,6 @@ void GameBaseWindow::onGamePreContinue() {
     this->backgroundItem->exceptedBlurRadius = 0;
     hidePauseMenu(true);
     emit onGameContinue();
+    this->scene->setFocus();
+    this->setFocus();
 }

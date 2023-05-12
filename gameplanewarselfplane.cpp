@@ -2,6 +2,7 @@
 #include "gameplanewarenemyplane.h"
 #include "gameplanewarbullet.h"
 #include "gameplanewar.h"
+#include "gamebasewindow.h"
 #include <QPixmap>
 #include <QGraphicsBlurEffect>
 #include <QGraphicsScene>
@@ -25,7 +26,7 @@ GamePlaneWarSelfPlane::GamePlaneWarSelfPlane(QObject *parent) {
 }
 
 void GamePlaneWarSelfPlane::updateScore() {
-    qDebug() << score;
+    ((GameBaseWindow*) ((GamePlaneWar*) this->game)->window)->setScore(score);
 }
 
 void GamePlaneWarSelfPlane::onKeyPressed(QKeyEvent *event) {
@@ -82,6 +83,8 @@ void GamePlaneWarSelfPlane::onEventTimerTimeout() {
                 }
                 else {
                     this->score = 0;
+                    emit onScoreTo0();
+                    return;
                 }
                 this->updateScore();
                 ((GamePlaneWar*) this->game)->enemyPlanes->removeAll(ene);
@@ -89,4 +92,11 @@ void GamePlaneWarSelfPlane::onEventTimerTimeout() {
             }
         }
     }
+}
+
+void GamePlaneWarSelfPlane::onGameEndCallback() {
+    this->up = false;
+    this->down = false;
+    this->left = false;
+    this->right = false;
 }

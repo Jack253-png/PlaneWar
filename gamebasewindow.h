@@ -23,11 +23,17 @@ public:
     QGraphicsScene* getScene();
     bool gameRunning;
     bool gamePausing;
+
+    void setScore(int i);
+    void setCustomMessage(QString string);
 protected:
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
 private:
+    QString customMessage;
+    int score = 0;
+    GraphicsButton *scoreLabel;
     QGraphicsScene *scene;
     QGraphicsPixmapItem* createBg();
     QTimer *baseTimer;
