@@ -8,6 +8,8 @@
 #include <cstdlib>
 #include <iostream>
 #include "windows.h"
+#include <QFile>
+#include <QIODevice>
 
 GamePlaneWar::GamePlaneWar(QObject *parent) {
     srand(rand());
@@ -52,16 +54,52 @@ GamePlaneWar::GamePlaneWar(QObject *parent) {
     connect(this->timeDelTimer, SIGNAL(timeout()), this, SLOT(onTimeDelTimerTimeout()));
 }
 
+void GamePlaneWar::saveHistroy() {
+    QFile *file = new QFile("planewar_save");
+    file->open(QIODevice::ReadWrite);
+    file->write(QString::number(this->selfPlane->score).toUtf8());
+    file->close();
+}
+
+int GamePlaneWar::readHistroy() {
+    QFile *file = new QFile("planewar_save");
+    file->open(QIODevice::ReadWrite);
+    QString result = file->readAll();
+    file->close();
+
+    bool ok;
+    return result.toInt(&ok, 10);
+}
+
+void GamePlaneWar::checkHistroyScore(bool isMenuEnd) {
+    int last = readHistroy();
+    bool uppedHistroy = this->selfPlane->score > readHistroy();
+    if (uppedHistroy) this->saveHistroy();
+
+    QString reason = isMenuEnd ? "您已退出游戏" : "时间到";
+    QString a = isMenuEnd ? "" : "您";
+    QString score = ", " + a + "得了 " + QString::number(this->selfPlane->score) + " 分";
+    QString histroy = uppedHistroy ? ", 已超过记录 " + QString::number(last) + " 分" : "";
+
+    ((GameBaseWindow*) this->window)->setCustomMessage(
+                reason + score + histroy
+    );
+}
+
+bool GamePlaneWar::isTimeout() {
+    return this->time_eplased > GAMETIME_SEC;
+}
+
 void GamePlaneWar::onTimeDelTimerTimeout() {
     this->time_eplased += 1;
-    qDebug() << this->time_eplased;
-    if (this->time_eplased > 30) {
-        ((GameBaseWindow*) this->window)->setCustomMessage("时间到, 您得了 " + QString::number(this->selfPlane->score) + " 分");
+    if (isTimeout()) {
+        checkHistroyScore(false);
         emit onGameTimeoutExit();
     }
 }
 
 void GamePlaneWar::onGameEndedScoreTo0() {
+    this->time_eplased = GAMETIME_SEC + 1;
     ((GameBaseWindow*) this->window)->setCustomMessage("分数归零, 游戏结束");
     emit onGameFailedExit();
 }
@@ -154,6 +192,7 @@ void GamePlaneWar::onGameStart() {
 }
 
 void GamePlaneWar::onGameEndCallback() {
+    if (!isTimeout()) checkHistroyScore(true);
     this->eventTimer->stop();
     this->selfPlane->show = false;
     this->selfPlane->exceptedBlurRadius = 20;

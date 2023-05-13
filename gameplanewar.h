@@ -10,6 +10,8 @@
 #include <QKeyEvent>
 #include <QGraphicsScene>
 
+#define GAMETIME_SEC 30
+
 class GamePlaneWar : public QObject
 {
     Q_OBJECT
@@ -19,6 +21,10 @@ public:
     QList<GamePlaneWarEnemyPlane*> *enemyPlanes;
     GamePlaneWarSelfPlane *selfPlane;
     QObject *window;
+
+    void saveHistroy();
+    int readHistroy();
+    bool isTimeout();
 private:
     QGraphicsScene *scene;
     QTimer *eventTimer;
@@ -28,6 +34,7 @@ private:
     void cleanBullets();
     void showEnemys(bool isBlur);
     void cleanEnemys();
+    void checkHistroyScore(bool isMenuEnd);
     bool isPausing = false;
 
     int time_eplased = 0;
