@@ -12,6 +12,7 @@
 #include <QGraphicsSceneHoverEvent>
 
 GraphicsButton::GraphicsButton(QObject *basescene) {
+    this->setCursor(Qt::CursorShape::PointingHandCursor);
     this->exceptedOpacity = 0.15;
     this->basescene = (QGraphicsScene*) basescene;
     this->internalText = new QGraphicsSimpleTextItem();

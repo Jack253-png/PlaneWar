@@ -43,6 +43,7 @@ void GameBaseWindow::initComponments() {
     this->backgroundItem->setPixmap(IMG_BACKGROUND);
     this->backgroundItem->show = true;
     this->backgroundItem->exceptedBlurRadius = 20;
+    this->scene->setBackgroundBrush(QBrush(IMG_BACKGROUND));
 
     this->gameTitle = new GraphicsButton(this->scene);
     this->gameTitle->setText("飞机大战");
